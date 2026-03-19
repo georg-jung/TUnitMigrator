@@ -32,27 +32,9 @@ static class PackagesMigrator
 
         var packageVersions = xml.Descendants("PackageVersion").ToList();
 
-        // Remove framework-specific and always-remove packages
+        // Handle extension packages first (suffix/direct replacement) before removing framework packages
+        // This ensures packages like Xunit.Combinatorial get migrated instead of removed
         foreach (var element in packageVersions.ToList())
-        {
-            var name = element.Attribute("Include")?.Value;
-            if (name == null)
-            {
-                continue;
-            }
-
-            if (alwaysRemove.Contains(name) ||
-                removePrefixes.Any(prefix => name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)))
-            {
-                Log.Information("Removing package {Package} from Directory.Packages.props", name);
-                migrations.Add((name, ""));
-                element.Remove();
-            }
-        }
-
-        // Handle extension packages (suffix replacement)
-        packageVersions = xml.Descendants("PackageVersion").ToList();
-        foreach (var element in packageVersions)
         {
             var name = element.Attribute("Include")?.Value;
             if (name == null)
@@ -70,6 +52,26 @@ static class PackagesMigrator
                 migrations.Add((name, newPackage));
             }
         }
+
+        // Remove framework-specific and always-remove packages
+        packageVersions = xml.Descendants("PackageVersion").ToList();
+        foreach (var element in packageVersions.ToList())
+        {
+            var name = element.Attribute("Include")?.Value;
+            if (name == null)
+            {
+                continue;
+            }
+
+            if (alwaysRemove.Contains(name) ||
+                removePrefixes.Any(prefix => name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)))
+            {
+                Log.Information("Removing package {Package} from Directory.Packages.props", name);
+                migrations.Add((name, ""));
+                element.Remove();
+            }
+        }
+
 
         // Add TUnit package
         var existingTUnit = xml.Descendants("PackageVersion")

@@ -78,4 +78,22 @@ public class ExtensionPackageResolverTests
         await Assert.That(result).IsNotNull();
         await Assert.That(result!.Value.version).IsNotNull();
     }
+
+    [Test]
+    public async Task ResolvesXunitCombinatorial()
+    {
+        var result = await ExtensionPackageResolver.TryResolve("Xunit.Combinatorial", sources, cache);
+
+        await Assert.That(result).IsNotNull();
+        await Assert.That(result!.Value.newPackage).IsEqualTo("GeorgJung.TUnit.PairwiseDataSource");
+    }
+
+    [Test]
+    public async Task ResolvesXunitCombinatorialVersion()
+    {
+        var result = await ExtensionPackageResolver.TryResolve("Xunit.Combinatorial", sources, cache);
+
+        await Assert.That(result).IsNotNull();
+        await Assert.That(result!.Value.version).IsNotNull();
+    }
 }
