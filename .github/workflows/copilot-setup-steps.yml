@@ -35,5 +35,5 @@ jobs:
         with:
           dotnet-version: '10.x'
 
-      - run: dotnet workload restore
-      - run: dotnet restore
+      - run: dotnet workload restore src/TUnitMigrator.slnx
+      - run: dotnet restore src/TUnitMigrator.slnx
