@@ -79,6 +79,8 @@ For any remaining package whose name ends with `.MSTest`, `.NUnit`, `.Xunit`, or
 
 Example: `Verify.MSTest` → `Verify.TUnit`
 
+Also migrates `Xunit.Combinatorial` to [`GeorgJung.TUnit.PairwiseDataSource`](https://github.com/georg-jung/TUnit.PairwiseDataSource) to preserve pairwise data generation support.
+
 
 ### 4. `.csproj` PackageReference Updates
 
