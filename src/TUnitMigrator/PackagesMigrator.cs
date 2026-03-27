@@ -20,6 +20,11 @@ static class PackagesMigrator
         "xunit"
     ];
 
+    static readonly Dictionary<string, string> manualPackageMigrations = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["Xunit.Combinatorial"] = "GeorgJung.TUnit.PairwiseDataSource"
+    };
+
     public static async Task<List<(string OldPackage, string NewPackage)>> Migrate(
         string propsPath,
         NuGetVersion tunitVersion,
@@ -31,6 +36,28 @@ static class PackagesMigrator
         var migrations = new List<(string OldPackage, string NewPackage)>();
 
         var packageVersions = xml.Descendants("PackageVersion").ToList();
+
+        // Handle explicit migrations that don't follow suffix conventions
+        foreach (var element in packageVersions)
+        {
+            var name = element.Attribute("Include")?.Value;
+            if (name == null)
+            {
+                continue;
+            }
+
+            if (manualPackageMigrations.TryGetValue(name, out var target))
+            {
+                var version = await NuGetPackageChecker.GetLatestStableVersion(target, sources, cache);
+                if (version != null)
+                {
+                    element.SetAttributeValue("Include", target);
+                    element.SetAttributeValue("Version", version.ToString());
+                    migrations.Add((name, target));
+                    Log.Information("Migrating package {Old} -> {New} ({Version})", name, target, version);
+                }
+            }
+        }
 
         // Remove framework-specific and always-remove packages
         foreach (var element in packageVersions.ToList())

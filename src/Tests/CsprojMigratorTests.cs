@@ -73,6 +73,31 @@ public class CsprojMigratorTests
     }
 
     [Test]
+    public async Task RenamesXunitCombinatorialPackage()
+    {
+        using var tempDir = new TempDirectory();
+        var csproj = Path.Combine(tempDir, "Test.csproj");
+        await File.WriteAllTextAsync(csproj,
+            """
+            <Project Sdk="Microsoft.NET.Sdk">
+              <ItemGroup>
+                <PackageReference Include="Xunit.Combinatorial" />
+              </ItemGroup>
+            </Project>
+            """);
+
+        List<(string OldPackage, string NewPackage)> migrations =
+        [
+            ("Xunit.Combinatorial", "GeorgJung.TUnit.PairwiseDataSource")
+        ];
+
+        await CsprojMigrator.Migrate(tempDir, migrations);
+
+        var result = await File.ReadAllTextAsync(csproj);
+        await Verify(result);
+    }
+
+    [Test]
     public async Task LeavesUnrelatedReferencesUntouched()
     {
         using var tempDir = new TempDirectory();

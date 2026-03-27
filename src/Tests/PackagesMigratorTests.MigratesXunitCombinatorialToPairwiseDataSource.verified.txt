@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="GeorgJung.TUnit.PairwiseDataSource" Version="{GeorgJung.TUnit.PairwiseDataSource.Version}" />
+    <PackageVersion Include="TUnit" Version="{TUnit.Version}" />
+  </ItemGroup>
+</Project>

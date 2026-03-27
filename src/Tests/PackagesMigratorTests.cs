@@ -186,6 +186,27 @@ public class PackagesMigratorTests
     }
 
     [Test]
+    public async Task MigratesXunitCombinatorialToPairwiseDataSource()
+    {
+        var (result, migrations) = await RunMigrate(
+            """
+            <Project>
+              <PropertyGroup>
+                <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+              </PropertyGroup>
+              <ItemGroup>
+                <PackageVersion Include="xunit" Version="2.9.3" />
+                <PackageVersion Include="Xunit.Combinatorial" Version="2.0.24" />
+              </ItemGroup>
+            </Project>
+            """);
+
+        await Verify(result);
+        await Assert.That(migrations).Contains(m =>
+            m is {OldPackage: "Xunit.Combinatorial", NewPackage: "GeorgJung.TUnit.PairwiseDataSource"});
+    }
+
+    [Test]
     public async Task PreservesUnrelatedPackages()
     {
         var (result, _) = await RunMigrate(
